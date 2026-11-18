@@ -1,0 +1,765 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Just an Illusion · Часть 2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column — mastery board of the 20 phrases, then five drills in a fixed ladder */
+:root {
+  --paper: #F1F4F0; --card: #FFFFFF; --ink: #1B2733; --muted: #5B6977; --line: #D6DCD5;
+  --accent: #2A55C9; --accent-soft: #E4EBFB; --on-accent: #FFFFFF;
+  --ok: #1D8455; --ok-soft: #DCF1E5; --bad: #BF3F2D; --bad-soft: #F8E2DD;
+  --mark: #FFE892; --mark-ink: #4A3C00; --dot: #CBD3CC;
+  --font-display: "Young Serif", Georgia, "Times New Roman", serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #11171D; --card: #19212A; --ink: #E4EAF0; --muted: #9AA7B4; --line: #2B3642;
+    --accent: #8AA8FF; --accent-soft: #1F2C4A; --on-accent: #0E1730;
+    --ok: #62D39F; --ok-soft: #163327; --bad: #FF8E7C; --bad-soft: #3B201B;
+    --mark: #5B4C14; --mark-ink: #FFF1BF; --dot: #34404C; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #11171D; --card: #19212A; --ink: #E4EAF0; --muted: #9AA7B4; --line: #2B3642;
+  --accent: #8AA8FF; --accent-soft: #1F2C4A; --on-accent: #0E1730;
+  --ok: #62D39F; --ok-soft: #163327; --bad: #FF8E7C; --bad-soft: #3B201B;
+  --mark: #5B4C14; --mark-ink: #FFF1BF; --dot: #34404C; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.55; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.wrap { max-width: 760px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+.hero { padding-block: 40px 16px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(32px, 6vw, 46px); line-height: 1.1; margin: 0 0 12px; text-wrap: balance; }
+.sub { margin: 0; color: var(--muted); max-width: 60ch; }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper); border-bottom: 1px solid var(--line); }
+.bar .wrap { display: flex; flex-direction: column; gap: 8px; padding-block: 10px; }
+.nav { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.nav::-webkit-scrollbar { display: none; }
+.nav a { flex: none; text-decoration: none; color: var(--ink); font-size: 14px; font-weight: 600; padding: 5px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); }
+.nav a:hover { border-color: var(--accent); color: var(--accent); }
+.progress { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.track { flex: 1; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.fill { height: 100%; width: 0; background: var(--ok); transition: width .4s ease; }
+.progress b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+main { padding-block: 8px 64px; }
+section { padding-top: 26px; scroll-margin-top: 110px; }
+h2 { font-family: var(--font-display); font-weight: 400; font-size: 26px; line-height: 1.2; margin: 0 0 4px; }
+.lead { margin: 0 0 14px; color: var(--muted); }
+
+/* Mastery board */
+.board { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px; }
+.chip { min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; display: flex; flex-direction: column; gap: 4px; }
+.chip .ph { font-weight: 600; font-size: 15px; line-height: 1.3; }
+.chip .ru { font-size: 12.5px; color: var(--muted); line-height: 1.3; }
+.dots { display: flex; gap: 3px; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--dot); }
+.dots i.on { background: var(--ok); }
+.chip.weak { border-color: var(--bad); }
+.chip.master { border-color: var(--ok); background: var(--ok-soft); }
+.board-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; font-size: 13px; color: var(--muted); }
+
+/* Exercise card */
+.ex { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 18px 16px; }
+.ex-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+h3 { margin: 0; font-size: 18px; font-weight: 700; }
+h3 .num { font-family: var(--font-mono); font-size: 13px; color: var(--accent); margin-right: 8px; }
+.score { flex: none; font-family: var(--font-mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); }
+.score.done { color: var(--ok); border-color: var(--ok); background: var(--ok-soft); }
+.instr { margin: 6px 0 14px; color: var(--muted); font-size: 15px; }
+ol.items { margin: 0; padding-left: 1.6em; display: flex; flex-direction: column; gap: 10px; }
+ol.items li { line-height: 2; padding-left: 4px; }
+ol.items li::marker { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+
+.choice { display: inline-flex; flex-wrap: wrap; gap: 4px; vertical-align: baseline; }
+.opt { font: inherit; font-size: 16px; line-height: 1.4; color: var(--ink); cursor: pointer; background: var(--card); border: 1.5px solid var(--line); border-radius: 999px; padding: 1px 11px; text-align: left; }
+.opt:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.opt.ok { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); font-weight: 600; cursor: default; }
+.opt.bad { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); text-decoration: line-through; cursor: default; }
+.opt.dim { opacity: .4; cursor: default; }
+.shake { animation: shake .3s; }
+@keyframes shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+
+/* MCQ */
+.q { margin: 0 0 6px; line-height: 1.5; }
+.mcq { display: flex; flex-wrap: wrap; gap: 6px; }
+.mcq .opt { border-radius: 8px; padding: 4px 12px; }
+
+/* Right or wrong */
+.tf-line { line-height: 1.5; margin: 0 0 6px; }
+.tf-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.fix { margin: 6px 0 0; font-size: 15px; line-height: 1.5; }
+.fix.ok { color: var(--ok); }
+.fix.bad { color: var(--bad); }
+.fix b { color: var(--ink); }
+
+.gap { font: inherit; font-size: 16px; color: var(--ink); background: var(--accent-soft); border: none; border-bottom: 2px dashed var(--accent); border-radius: 4px 4px 0 0; padding: 1px 6px; max-width: 100%; }
+.gap:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.gap.ok { background: var(--ok-soft); border-bottom: 2px solid var(--ok); }
+.gap.bad { background: var(--bad-soft); border-bottom: 2px solid var(--bad); }
+.gap.shown { background: var(--mark); color: var(--mark-ink); border-bottom: 2px solid var(--mark-ink); }
+
+/* Translate */
+.tr li { line-height: 1.5 !important; }
+.tr .ru-line { margin: 0 0 6px; font-weight: 500; }
+.tr textarea { width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; resize: vertical; min-height: 44px; }
+.tr textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.tr textarea.ok { border-color: var(--ok); background: var(--ok-soft); }
+.tr textarea.bad { border-color: var(--bad); background: var(--bad-soft); }
+.tr .line { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; align-items: center; }
+.model { margin: 8px 0 2px; font-size: 15px; color: var(--muted); }
+.model b { color: var(--ink); }
+
+.foot { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.btn { font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; padding: 7px 14px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn.primary:hover { filter: brightness(1.08); color: var(--on-accent); }
+.btn.small { font-size: 13px; padding: 4px 10px; }
+.btn:focus-visible, .opt:focus-visible, .nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.note { margin: 14px 0 0; padding: 10px 12px; border-radius: 8px; font-size: 15px; background: var(--accent-soft); }
+
+@media (max-width: 480px) { body { font-size: 16px; } .ex { padding: 14px; } ol.items { padding-left: 1.3em; } }
+@media (prefers-reduced-motion: reduce) { .shake { animation: none; } .fill { transition: none; } html { scroll-behavior: auto; } }
+
+/* Word order */
+.uns { display: flex; flex-direction: column; gap: 6px; }
+.answer-line { min-height: 42px; display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; border: 1.5px dashed var(--line); border-radius: 8px; background: var(--paper); }
+.answer-line.ok { border: 1.5px solid var(--ok); background: var(--ok-soft); }
+.answer-line.bad { border: 1.5px solid var(--bad); background: var(--bad-soft); }
+.tiles { display: flex; flex-wrap: wrap; gap: 6px; }
+.tile { font: inherit; font-size: 16px; padding: 3px 10px; border-radius: 6px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+.tile:hover { border-color: var(--accent); color: var(--accent); }
+.tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.uns .line { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.uns .fix { margin: 0; }
+
+.cue { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .06em; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin: 0 3px; white-space: nowrap; }
+.bank { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; padding: 10px; border: 1px dashed var(--line); border-radius: 8px; }
+.bank span { font-size: 14px; padding: 2px 9px; border-radius: 6px; background: var(--accent-soft); }
+p.text { margin: 0 0 10px; line-height: 2.2; }
+
+/* flashcards */
+.fc-tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.btn.ghost { background: transparent; border: 1px solid var(--line); color: inherit; }
+.flip { perspective: 1200px; cursor: pointer; outline: none; margin: 0 auto; max-width: 560px; }
+.flip-in { position: relative; min-height: 220px; transition: transform .45s; transform-style: preserve-3d; }
+.flip.on .flip-in { transform: rotateY(180deg); }
+.flip:focus-visible .flip-in { box-shadow: 0 0 0 3px var(--accent-soft); border-radius: 14px; }
+.face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 22px 18px 30px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+.face.back { transform: rotateY(180deg); background: var(--accent-soft); }
+.fc-word { font-size: clamp(22px, 5vw, 30px); font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+.fc-ru { font-size: clamp(19px, 4.4vw, 25px); font-weight: 600; line-height: 1.3; }
+.fc-def { font-size: 14px; opacity: .75; max-width: 42ch; }
+.fc-hint { position: absolute; bottom: 8px; font-size: 12px; opacity: .45; }
+.speak { font-size: 22px; line-height: 1; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+.fc-nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 12px 0 6px; }
+.fc-nav .btn { font-size: 20px; padding: 4px 16px; }
+.fc-count { font-variant-numeric: tabular-nums; min-width: 5ch; text-align: center; }
+.fc-rate { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.btn.again { background: transparent; border: 1px solid #d9822b; color: #d9822b; }
+.btn.know { background: #2e9e5b; border: 1px solid #2e9e5b; color: #fff; }
+.fc-done { text-align: center; }
+.fc-done p { font-weight: 600; margin: 8px 0 10px; }
+.btn.know:hover { color: #fff; filter: brightness(1.08); border-color: #2e9e5b; }
+.btn.again:hover { color: #d9822b; border-color: #d9822b; background: rgba(217,130,43,.08); }
+</style>
+
+<p class="wrap back" style="margin:18px auto 0;font-size:15px"><a href="../index.html">← Spotlight 9: все тексты</a></p>
+<header class="hero wrap">
+  <p class="eyebrow">Spotlight 9 · стр. 48 · Just an Illusion · часть 2 из 2</p>
+  <h1>Just an Illusion · Часть 2</h1>
+  <p class="sub">12 слов из второй половины текста «Just an Illusion». Карточки и семь тренировок — каждая по всем словам.</p>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <nav class="nav" id="nav" aria-label="Drills"></nav>
+    <div class="progress" aria-live="polite">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <span><b id="mastered">0</b> / <b id="ptotal">0</b> learned</span>
+    </div>
+  </div>
+</div>
+
+<main class="wrap" id="main">
+  <section id="board-sec">
+    <h2>Твои слова</h2>
+    <p class="lead">Каждый правильный ответ добавляет точку. Все точки зелёные — слово выучено. Красная рамка — повтори его.</p>
+    <div class="board" id="board"></div>
+    <div class="board-foot">
+      <span>Progress is saved in this browser.</span>
+      <button class="btn small" type="button" id="reset-all">Reset my progress</button>
+    </div>
+  </section>
+</main>
+
+<script>
+// TITLE: Just an Illusion · Часть 2
+// EYEBROW: Spotlight 9 · стр. 48 · Just an Illusion · часть 2 из 2
+// SUB: 12 слов из второй половины текста «Just an Illusion». Карточки и семь тренировок — каждая по всем словам.
+// BOARD: Твои слова
+// LEAD: Каждый правильный ответ добавляет точку. Все точки зелёные — слово выучено. Красная рамка — повтори его.
+/* Auto-built drills from P: EN→RU meaning and definition → word. g = group of look-alike translations (never distractors for each other). */
+const AUTO = {
+  sh(a) { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; },
+  others(p, key, n) {
+    const out = [];
+    AUTO.sh(P.filter(x => x.id !== p.id && !(p.g && x.g === p.g))).forEach(x => { if (out.length < n && x[key] !== p[key] && !out.includes(x[key])) out.push(x[key]); });
+    return out;
+  },
+  enru() { return P.map(p => ({ id: p.id, q: p.phrase, o: [p.ru, ...AUTO.others(p, "ru", 3)] })); },
+  defn() { return P.filter(p => p.en).map(p => ({ id: p.id, q: p.en, o: [p.phrase, ...AUTO.others(p, "phrase", 3)] })); }
+};
+
+const META = { ls: "s9-p48-2" };
+const P = [
+  { id: "images", phrase: "images", ru: "изображения", en: "pictures" },
+  { id: "learn", phrase: "learn – learnt", ru: "учиться, узнавать", en: "to get new knowledge or a new skill", say: "learn, learnt" },
+  { id: "certain", phrase: "a certain way", ru: "определённым образом", en: "in one particular way" },
+  { id: "example", phrase: "for example", ru: "например", en: "you say this before you give an example" },
+  { id: "why", phrase: "this is why", ru: "вот почему, поэтому", en: "you say this to give the reason for something" },
+  { id: "teach", phrase: "teach – taught", ru: "учить (кого-то), обучать", en: "to help someone learn something", say: "teach, taught" },
+  { id: "firstly", phrase: "firstly", ru: "во-первых", en: "you say this before your first point" },
+  { id: "else", phrase: "something else", ru: "что-то другое, что-то ещё", en: "a different thing" },
+  { id: "continue", phrase: "continue", ru: "продолжать", en: "to keep doing something" },
+  { id: "stare", phrase: "stare at", ru: "пристально смотреть, уставиться на", en: "to look at something for a long time" },
+  { id: "opinion", phrase: "opinion", ru: "мнение", en: "what you think about something" },
+  { id: "different", phrase: "in a different way", ru: "по-другому, иначе", en: "not in the same way" }
+];
+const DRILLS = [
+  { type: "meaning", title: "Найди слово", short: "RU → EN", instr: "Прочитай по-русски и выбери, как это будет по-английски." },
+  { type: "mcq", title: "Что это значит?", short: "EN → RU", instr: "Прочитай слово по-английски и выбери перевод.", items: AUTO.enru() },
+  { type: "gaps", title: "Choose the word: the text", short: "Text", instr: "Это предложения из текста «Just an Illusion». Выбери слово, которое было в тексте.",
+    items: [
+      { id: "images", t: "Our eyes take in {{*images|opinions|examples}} all day long." },
+      { id: "learn", t: "Our brain then {{*learns|teaches|stares}} how to see things a certain way." },
+      { id: "certain", t: "Our brain learns how to see things {{*a certain way|for example|this is why}}." },
+      { id: "example", t: "When we watch TV, {{*for example|something else|a certain way}}, our brain has learnt to see movement." },
+      { id: "why", t: "{{*This is why|A certain way|Something else}} we can have so much fun with optical illusions!" },
+      { id: "teach", t: "Optical illusions can {{*teach|learn|stare}} us some important lessons about life." },
+      { id: "firstly", t: "{{*Firstly|Something else|A certain way}}, there may be more to a situation than we see at first." },
+      { id: "else", t: "We see one thing at first and {{*something else|for example|a certain way}} when we continue to stare at it." },
+      { id: "continue", t: "…and something else when we {{*continue|teach|opinion}} to stare at it." },
+      { id: "stare", t: "…and something else when we continue to {{*stare at|teach|firstly}} it." },
+      { id: "opinion", t: "It's okay if you and your friend have a different {{*opinion|image|example}} about something." },
+      { id: "different", t: "You are just seeing things {{*in a different way|for example|this is why}}, that's all!" }
+    ] },
+  { type: "mcq", title: "Guess the word", short: "Definitions", instr: "Прочитай объяснение по-английски и выбери слово.", items: AUTO.defn() },
+  { type: "tf", title: "Right or wrong?", short: "Right or wrong", instr: "Предложение верное или с ошибкой? Подумай и про текст, и про слова.",
+    items: [
+      { id: "images", t: "When we watch TV, we see a series of individual images very quickly.", ok: true },
+      { id: "teach", t: "Optical illusions can teach us important lessons about life.", ok: true },
+      { id: "opinion", t: "It's bad if you and your friend have a different opinion.", ok: false, fix: "It's okay if you and your friend have a different opinion." },
+      { id: "learn", t: "My dad learnt me to swim.", ok: false, fix: "My dad taught me to swim." },
+      { id: "stare", t: "She stared at the picture for a long time.", ok: true },
+      { id: "continue", t: "He continued to read after dinner.", ok: true },
+      { id: "else", t: "I don't like fish. Let's eat something other.", ok: false, fix: "I don't like fish. Let's eat something else." },
+      { id: "firstly", t: "Firstly, I want to say thank you.", ok: true },
+      { id: "why", t: "I was ill. This is why I didn't go to school.", ok: true },
+      { id: "different", t: "People sometimes see the same picture in a different ways.", ok: false, fix: "People sometimes see the same picture in different ways." }
+    ] },
+  { type: "gaps", title: "Choose the word: new sentences", short: "Choose", instr: "Теперь те же слова в новых предложениях. Выбери подходящее.",
+    items: [
+      { id: "images", t: "This app can make funny {{*images|opinions|examples}} from your photos." },
+      { id: "learn", t: "Babies {{*learn|teach|stare}} to walk when they are about one year old." },
+      { id: "teach", t: "My mum is going to {{*teach|learn|continue}} me how to drive." },
+      { id: "certain", t: "You have to hold the camera in {{*a certain way|for example|something else}} to take a good photo." },
+      { id: "example", t: "I love fruit, {{*for example|this is why|firstly}} apples and bananas." },
+      { id: "why", t: "I missed the bus. {{*This is why|For example|Something else}} I was late for school." },
+      { id: "firstly", t: "{{*Firstly|Something else|In a different way}}, I want to thank you all for coming. Secondly, I have some news." },
+      { id: "opinion", t: "In my {{*opinion|image|example}}, this is the best film of the year." },
+      { id: "different", t: "The first idea didn't work, so let's do it {{*in a different way|for example|this is why}}." },
+      { id: "else", t: "I don't want pizza. Let's order {{*something else|a certain way|for example}}." },
+      { id: "continue", t: "Please {{*continue|teach|stare at}} reading — you're doing great!" },
+      { id: "stare", t: "It's rude to {{*stare at|teach|continue}} people on the bus." }
+    ] },
+  { type: "order", title: "Собери предложение", short: "Collect", instr: "Нажимай на слова по порядку и собери предложение по-английски. Печатать не нужно.",
+    items: [
+      { id: "why", q: "Вот почему мне нравятся оптические иллюзии.", s: "This is why I like optical illusions." },
+      { id: "opinion", q: "Во-первых, у меня другое мнение.", s: "Firstly, I have a different opinion." },
+      { id: "stare", q: "Не смотри на меня так пристально!", s: "Don't stare at me!" },
+      { id: "different", q: "Попробуй сделать это по-другому.", s: "Try to do it in a different way." },
+      { id: "teach", q: "Учитель научил нас чему-то новому.", s: "The teacher taught us something new." },
+      { id: "example", q: "Например, мы видим движение по телевизору.", s: "For example, we see movement on TV." },
+      { id: "else", q: "Потом мы видим что-то другое.", s: "Then we see something else." },
+      { id: "continue", q: "Продолжай читать!", s: "Continue reading!" }
+    ] }
+];
+
+/* ===== Drill engine (shared). Expects META, P, DRILLS defined before this script. ===== */
+const byId = Object.fromEntries(P.map(p => [p.id, p]));
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const norm = s => (s || "").toLowerCase().replace(/[’‘]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, " ").trim().replace(/[.!?,;:]+$/, "");
+
+let M = {};
+try { M = JSON.parse(localStorage.getItem(META.ls) || "{}") || {}; } catch (e) { M = {}; }
+const save = () => { try { localStorage.setItem(META.ls, JSON.stringify(M)); } catch (e) {} };
+const COUNT = {};
+let COUNTING = true;
+const reg = id => { if (COUNTING && id && byId[id]) COUNT[id] = (COUNT[id] || 0) + 1; };
+const goal = id => Math.max(1, Math.min(5, COUNT[id] || 5));
+function hit(id, ok) {
+  if (!id || !byId[id]) return;
+  const r = M[id] || (M[id] = { c: 0, m: 0 });
+  if (ok) r.c++; else r.m++;
+  save(); renderBoard();
+}
+function renderBoard() {
+  const b = document.getElementById("board");
+  b.innerHTML = "";
+  let learned = 0;
+  P.forEach(p => {
+    const r = M[p.id] || { c: 0, m: 0 };
+    const g = goal(p.id);
+    const n = Math.min(g, r.c);
+    if (n >= g) learned++;
+    const chip = el("div", "chip" + (n >= g ? " master" : r.m > r.c ? " weak" : ""));
+    chip.append(el("span", "ph", p.phrase), el("span", "ru", p.ru));
+    const dots = el("span", "dots");
+    dots.setAttribute("aria-label", `${n} of ${g}`);
+    for (let i = 0; i < g; i++) dots.append(el("i", i < n ? "on" : ""));
+    chip.append(dots);
+    b.append(chip);
+  });
+  document.getElementById("mastered").textContent = learned;
+  document.getElementById("ptotal").textContent = P.length;
+  document.getElementById("fill").style.width = `${(learned / P.length) * 100}%`;
+}
+
+function card(num, def) {
+  const sec = el("section");
+  sec.id = `d${num}`;
+  const ex = el("article", "ex");
+  const head = el("div", "ex-head");
+  const h3 = el("h3");
+  h3.append(el("span", "num", `Drill ${num}`), def.title);
+  const score = el("span", "score");
+  head.append(h3, score);
+  ex.append(head, el("p", "instr", def.instr));
+  if (def.bank) {
+    const bank = el("div", "bank");
+    def.bank.forEach(w => bank.append(el("span", null, w)));
+    ex.append(bank);
+  }
+  const body = el("div");
+  const foot = el("div", "foot");
+  ex.append(body, foot);
+  if (def.note) ex.append(el("p", "note", def.note));
+  sec.append(ex);
+  document.getElementById("main").append(sec);
+  const a = el("a", null, `${num} · ${def.short}`);
+  a.href = `#d${num}`;
+  document.getElementById("nav").append(a);
+  return { body, foot, score, total: 0, ok: 0, def };
+}
+const setScore = d => { d.score.textContent = `${d.ok} / ${d.total}`; d.score.classList.toggle("done", d.total > 0 && d.ok === d.total); };
+function resetBtn(d, build) {
+  const r = el("button", "btn", "Start again");
+  r.type = "button";
+  r.addEventListener("click", () => { d.body.innerHTML = ""; d.foot.innerHTML = ""; build(); });
+  d.foot.append(r);
+}
+function splitId(spec, fallback) {
+  const i = spec.lastIndexOf("#");
+  return i > -1 ? [spec.slice(0, i), spec.slice(i + 1)] : [spec, fallback];
+}
+function options(list, correctSet, id, d, shuf) {
+  reg(id);
+  const wrap = el("span", "choice");
+  let done = false;
+  (shuf ? shuffle(list) : list).forEach(o => {
+    const b = el("button", "opt", o);
+    b.type = "button";
+    b.addEventListener("click", () => {
+      if (done || b.disabled) return;
+      if (correctSet.includes(o)) {
+        done = true;
+        b.classList.add("ok");
+        wrap.querySelectorAll(".opt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+        d.ok++; setScore(d); hit(id, true);
+      } else {
+        b.classList.add("bad", "shake");
+        b.disabled = true;
+        hit(id, false);
+      }
+    });
+    wrap.append(b);
+  });
+  return wrap;
+}
+
+/* Inline text with {{*right|wrong#id}} choices, [[ans/alt#id]] typed gaps, ^CUE^ word-formation cues */
+const TOK = /\{\{(.+?)\}\}|\[\[(.+?)\]\]|\^(.+?)\^/g;
+function inline(text, id, d, gaps, shuf) {
+  const frag = document.createDocumentFragment();
+  let last = 0;
+  text.replace(TOK, (m, c, t, q, off) => {
+    frag.append(text.slice(last, off));
+    if (c) {
+      const [spec, gid] = splitId(c, id);
+      const raw = spec.split("|");
+      const right = raw.filter(o => o.startsWith("*")).map(o => o.slice(1));
+      frag.append(options(raw.map(o => o.replace(/^\*/, "")), right, gid, d, shuf));
+      d.total++;
+    } else if (t) {
+      const [spec, gid] = splitId(t, id);
+      const answers = spec.split("/");
+      const inp = el("input", "gap");
+      inp.type = "text"; inp.autocomplete = "off"; inp.spellcheck = false;
+      inp.id = `g${d.num}-${gaps.length}`;
+      inp.setAttribute("autocapitalize", "off"); inp.setAttribute("aria-label", "gap");
+      inp.style.width = `${Math.max(6, Math.max(...answers.map(a => a.length)) + 2)}ch`;
+      reg(gid);
+      const g = { inp, answers: answers.map(norm), show: answers[0], id: gid, ok: false };
+      gaps.push(g);
+      inp.addEventListener("input", () => inp.classList.remove("ok", "bad", "shown"));
+      inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); d.check(); } });
+      frag.append(inp);
+      d.total++;
+    } else {
+      frag.append(el("span", "cue", q));
+    }
+    last = off + m.length;
+    return m;
+  });
+  frag.append(text.slice(last));
+  return frag;
+}
+
+const RENDER = {
+  /* sentences with inline choices and/or typed gaps */
+  gaps(d) {
+    const def = d.def;
+    const gaps = [];
+    d.check = () => {
+      gaps.forEach(g => {
+        if (g.ok) return;
+        const v = norm(g.inp.value);
+        if (!v) return;
+        g.inp.classList.remove("ok", "bad", "shown");
+        if (g.answers.includes(v)) { g.ok = true; g.inp.classList.add("ok"); g.inp.readOnly = true; d.ok++; hit(g.id, true); }
+        else { g.inp.classList.add("bad"); hit(g.id, false); }
+      });
+      setScore(d);
+    };
+    const items = def.keepOrder ? def.items : shuffle(def.items);
+    const shuf = def.shuffleOptions !== false;
+    if (def.layout === "text") {
+      items.forEach(it => { const p = el("p", "text"); p.append(inline(it.t, it.id, d, gaps, shuf)); d.body.append(p); });
+    } else {
+      const ol = el("ol", "items");
+      items.forEach(it => { const li = el("li"); li.append(inline(it.t, it.id, d, gaps, shuf)); ol.append(li); });
+      d.body.append(ol);
+    }
+    if (gaps.length) {
+      const c = el("button", "btn primary", "Check"); c.type = "button"; c.addEventListener("click", d.check);
+      const s = el("button", "btn", "Show answers"); s.type = "button";
+      s.addEventListener("click", () => gaps.forEach(g => { if (!g.ok) { g.inp.value = g.show; g.inp.classList.remove("bad"); g.inp.classList.add("shown"); } }));
+      d.foot.append(c, s);
+    }
+  },
+  /* question + option buttons; first option in o is the correct one */
+  mcq(d) {
+    const ol = el("ol", "items");
+    shuffle(d.def.items).forEach(it => {
+      const li = el("li");
+      li.append(el("p", "q", it.q));
+      const box = el("div", "mcq");
+      box.append(options([...it.o], [it.o[0]], it.id, d, true));
+      d.total++;
+      li.append(box);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* meaning -> phrase, built from P */
+  meaning(d) {
+    const ol = el("ol", "items");
+    const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+    shuffle(pool).forEach(p => {
+      const li = el("li");
+      li.append(el("p", "q", p.ru));
+      const lab = x => x.opt || x.phrase;
+      const others = [...new Set(shuffle(pool.filter(x => x.id !== p.id)).map(lab))].filter(t => t !== lab(p)).slice(0, 3);
+      const box = el("div", "mcq");
+      box.append(options([lab(p), ...others], [lab(p)], p.id, d, true));
+      d.total++;
+      li.append(box);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* right or wrong */
+  tf(d) {
+    const ol = el("ol", "items");
+    shuffle(d.def.items).forEach(it => {
+      d.total++; reg(it.id);
+      const li = el("li");
+      li.append(el("p", "tf-line", it.t));
+      const btns = el("div", "tf-btns");
+      const fb = el("p", "fix"); fb.hidden = true;
+      let done = false;
+      [["Right", true], ["Wrong", false]].forEach(([label, val]) => {
+        const b = el("button", "opt", label);
+        b.type = "button";
+        b.addEventListener("click", () => {
+          if (done) return;
+          done = true;
+          const correct = val === it.ok;
+          b.classList.add(correct ? "ok" : "bad");
+          btns.querySelectorAll(".opt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+          fb.hidden = false;
+          fb.className = "fix " + (correct ? "ok" : "bad");
+          fb.innerHTML = "";
+          if (it.ok) fb.append(correct ? "Yes, that's correct." : "It was correct.");
+          else fb.append(correct ? "Yes! Correct version: " : "It was wrong. Correct version: ", el("b", null, it.fix));
+          if (correct) { d.ok++; setScore(d); }
+          hit(it.id, correct);
+        });
+        btns.append(b);
+      });
+      li.append(btns, fb);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* word order */
+  order(d) {
+    const ol = el("ol", "items");
+    shuffle(d.def.items).forEach(it => {
+      d.total++; reg(it.id);
+      const li = el("li");
+      if (it.q) li.append(el("p", "q", it.q));
+      const wrap = el("div", "uns");
+      const target = it.s.split(" ");
+      const line = el("div", "answer-line");
+      line.setAttribute("aria-label", "Your sentence");
+      const pool = el("div", "tiles");
+      const fb = el("p", "fix"); fb.hidden = true;
+      let solved = false;
+      const mk = w => {
+        const t = el("button", "tile", w);
+        t.type = "button";
+        t.addEventListener("click", () => {
+          if (solved) return;
+          (t.parentElement === pool ? line : pool).append(t);
+          line.classList.remove("bad"); fb.hidden = true;
+        });
+        return t;
+      };
+      let order = shuffle(target);
+      if (order.join(" ") === it.s && target.length > 1) order = [...order.slice(1), order[0]];
+      order.forEach(w => pool.append(mk(w)));
+      const controls = el("div", "line");
+      const c = el("button", "btn small primary", "Check"); c.type = "button";
+      const sh = el("button", "btn small", "Show answer"); sh.type = "button";
+      c.addEventListener("click", () => {
+        if (solved) return;
+        const built = [...line.children].map(x => x.textContent).join(" ");
+        if (!built) return;
+        fb.hidden = false;
+        const alts = [it.s, ...(it.alt || [])];
+        if (alts.includes(built)) {
+          solved = true; line.classList.add("ok"); fb.className = "fix ok"; fb.textContent = "Correct!";
+          d.ok++; setScore(d); hit(it.id, true);
+        } else if (pool.children.length) {
+          fb.className = "fix bad"; fb.textContent = "Use all the words.";
+        } else {
+          line.classList.add("bad"); fb.className = "fix bad"; fb.textContent = "Not quite. Tap words to move them and try again.";
+          hit(it.id, false);
+        }
+      });
+      sh.addEventListener("click", () => { fb.hidden = false; fb.className = "fix"; fb.innerHTML = ""; fb.append("Answer: ", el("b", null, it.s)); });
+      controls.append(c, sh);
+      wrap.append(line, pool, controls, fb);
+      li.append(wrap);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* translation; key = regex the answer must contain */
+  translate(d) {
+    const ol = el("ol", "items tr");
+    shuffle(d.def.items).forEach((it, i) => {
+      d.total++; reg(it.id);
+      const li = el("li");
+      li.append(el("p", "ru-line", it.ru));
+      const ta = el("textarea");
+      ta.id = `t${d.num}-${i}`; ta.rows = 1; ta.placeholder = "Type in English…"; ta.setAttribute("aria-label", "Your translation");
+      const line = el("div", "line");
+      const c = el("button", "btn small primary", "Check"); c.type = "button";
+      const sh = el("button", "btn small", "Show model"); sh.type = "button";
+      const model = el("p", "model"); model.hidden = true;
+      let solved = false;
+      const re = new RegExp(`(^|[^a-z'])(${it.key})($|[^a-z'])`, "i");
+      const check = () => {
+        if (solved || !ta.value.trim()) return;
+        const v = norm(ta.value);
+        ta.classList.remove("ok", "bad");
+        model.hidden = false; model.innerHTML = "";
+        if (re.test(v)) {
+          solved = true; ta.classList.add("ok"); ta.readOnly = true;
+          model.append("Correct. Model: ", el("b", null, it.en));
+          d.ok++; setScore(d); hit(it.id, true);
+        } else {
+          ta.classList.add("bad");
+          model.append("Use ", el("b", null, it.hint || (byId[it.id] ? byId[it.id].phrase : "the target phrase")), ". Try again.");
+          hit(it.id, false);
+        }
+      };
+      c.addEventListener("click", check);
+      ta.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); check(); } });
+      sh.addEventListener("click", () => { model.hidden = false; model.innerHTML = ""; model.append("Model: ", el("b", null, it.en)); });
+      line.append(c, sh);
+      li.append(ta, line, model);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  }
+};
+
+
+/* ===== Flashcards (auto Drill 1) ===== */
+const sayText = p => (p.say || p.phrase)
+  .replace(/\([^)]*\)/g, " ").replace(/→/g, ", ").replace(/…|\.\.\./g, " ")
+  .replace(/\bsb\b/g, "someone").replace(/\bsth\b/g, "something")
+  .replace(/\s\/\s/g, " or ").replace(/^-/, "").replace(/\s+/g, " ").trim();
+let VOICE = null;
+function pickVoice() {
+  try {
+    const vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
+    VOICE = vs.find(v => /en[-_]GB/i.test(v.lang) && /google|natural|online|serena|daniel|kate/i.test(v.name))
+      || vs.find(v => /en[-_]GB/i.test(v.lang)) || vs.find(v => /en[-_]US/i.test(v.lang)) || vs[0] || null;
+  } catch (e) { VOICE = null; }
+}
+try { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; } catch (e) {}
+function speak(text) {
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    if (VOICE) u.voice = VOICE;
+    u.lang = VOICE ? VOICE.lang : "en-GB";
+    u.rate = 0.9;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+const HAS_TTS = typeof window !== "undefined" && "speechSynthesis" in window;
+
+RENDER.cards = function (d) {
+  let deck = P.map(p => p.id), pos = 0, flipped = false, ruFirst = false, known = 0, auto = false;
+  d.total = deck.length;
+  const box = el("div", "fc");
+  const tools = el("div", "fc-tools");
+  const mk = (txt, title) => { const b = el("button", "btn ghost", txt); b.type = "button"; if (title) b.title = title; return b; };
+  const bShuf = mk("Shuffle"), bDir = mk("Russian first"), bAuto = mk("Auto-sound: off");
+  tools.append(bShuf, bDir);
+  if (HAS_TTS) tools.append(bAuto);
+  const flip = el("div", "flip"); flip.tabIndex = 0; flip.setAttribute("role", "button");
+  const inner = el("div", "flip-in");
+  const front = el("div", "face front"), back = el("div", "face back");
+  inner.append(front, back); flip.append(inner);
+  const nav = el("div", "fc-nav");
+  const bPrev = mk("‹"), bNext = mk("›"), count = el("span", "fc-count");
+  bPrev.setAttribute("aria-label", "previous"); bNext.setAttribute("aria-label", "next");
+  nav.append(bPrev, count, bNext);
+  const rate = el("div", "fc-rate");
+  const bAgain = el("button", "btn again", "Again · Ещё раз"), bKnow = el("button", "btn know", "I know it · Знаю");
+  bAgain.type = bKnow.type = "button";
+  rate.append(bAgain, bKnow);
+  const done = el("div", "fc-done");
+  box.append(tools, flip, nav, rate, done);
+  d.body.append(box);
+
+  const face = (node, p, en) => {
+    node.innerHTML = "";
+    if (en) {
+      node.append(el("div", "fc-word", p.phrase));
+      if (HAS_TTS) {
+        const s = el("button", "speak", "🔊"); s.type = "button"; s.setAttribute("aria-label", "listen");
+        s.addEventListener("click", e => { e.stopPropagation(); speak(sayText(p)); });
+        node.append(s);
+      }
+    } else {
+      node.append(el("div", "fc-ru", p.ru));
+      if (p.en) node.append(el("div", "fc-def", p.en));
+    }
+    node.append(el("div", "fc-hint", "tap to flip"));
+  };
+  function show() {
+    done.innerHTML = "";
+    const left = deck.length > 0;
+    [flip, nav, rate].forEach(x => x.hidden = !left);
+    if (!left) {
+      done.append(el("p", null, `All ${P.length} cards done! Now go to Drill 2.`));
+      const r = mk("Go through the cards again"); r.addEventListener("click", () => { deck = P.map(p => p.id); known = 0; d.ok = 0; setScore(d); pos = 0; show(); });
+      done.append(r);
+      return;
+    }
+    pos = (pos + deck.length) % deck.length;
+    const p = byId[deck[pos]];
+    flipped = false; flip.classList.remove("on");
+    face(front, p, !ruFirst); face(back, p, ruFirst);
+    count.textContent = `${pos + 1} / ${deck.length}`;
+    if (auto && !ruFirst) speak(sayText(p));
+  }
+  function turn() {
+    flipped = !flipped; flip.classList.toggle("on", flipped);
+    if (auto && ruFirst && flipped) speak(sayText(byId[deck[pos]]));
+  }
+  flip.addEventListener("click", turn);
+  flip.addEventListener("keydown", e => {
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); turn(); }
+    else if (e.key === "ArrowRight") { pos++; show(); }
+    else if (e.key === "ArrowLeft") { pos--; show(); }
+  });
+  bPrev.addEventListener("click", () => { pos--; show(); });
+  bNext.addEventListener("click", () => { pos++; show(); });
+  bShuf.addEventListener("click", () => { deck = shuffle(deck); pos = 0; show(); });
+  bDir.addEventListener("click", () => { ruFirst = !ruFirst; bDir.textContent = ruFirst ? "English first" : "Russian first"; show(); });
+  bAuto.addEventListener("click", () => { auto = !auto; bAuto.textContent = `Auto-sound: ${auto ? "on" : "off"}`; if (auto) show(); });
+  bKnow.addEventListener("click", () => { deck.splice(pos, 1); known++; d.ok = known; setScore(d); show(); });
+  bAgain.addEventListener("click", () => { const id = deck.splice(pos, 1)[0]; deck.push(id); if (pos >= deck.length - 1 && deck.length > 1) pos = deck.length - 1; show(); });
+  show();
+};
+
+function startDrill(num, def) {
+  const d = card(num, def);
+  d.num = num;
+  const build = () => {
+    d.ok = 0; d.total = 0;
+    RENDER[def.type](d);
+    setScore(d);
+    resetBtn(d, build);
+  };
+  build();
+}
+
+document.getElementById("reset-all").addEventListener("click", e => {
+  const b = e.currentTarget;
+  if (b.dataset.armed) { M = {}; save(); renderBoard(); b.textContent = "Reset my progress"; delete b.dataset.armed; }
+  else { b.dataset.armed = "1"; b.textContent = "Tap again to reset"; setTimeout(() => { if (b.dataset.armed) { delete b.dataset.armed; b.textContent = "Reset my progress"; } }, 3000); }
+});
+const boardLink = el("a", null, "Phrases"); boardLink.href = "#board-sec";
+document.getElementById("nav").append(boardLink);
+const CARDS = { type: "cards", title: "Flashcards", short: "Cards",
+  instr: "Look at the card and say what it means. Tap the card to flip it, 🔊 to listen. Then tap “I know it” or “Again” – the “Again” cards come back at the end." };
+(META.cards === false ? DRILLS : [CARDS, ...DRILLS]).forEach((def, i) => startDrill(i + 1, def));
+COUNTING = false;
+renderBoard();
+
+</script>

@@ -19,8 +19,12 @@ TOPICS = [
      "horrifying, across, wrap, a violent whirlpool, a species, there's no doubt, whether…"),
     ("Стр. 43 · Mysterious creatures", "p43/43-3.html", "s9-43-3", "43-3 · Bigfoot",
      "witnesses, describe, footprints, extinct, unfortunately, so far, a fossil…"),
-    ("Стр. 48 · Just an Illusion", "p48/48.html", "s9-48", "48 · Just an Illusion",
-     "an optical illusion, eventually, appear, play tricks on, complicated, firstly, stare at…"),
+    ("Стр. 48 · Just an Illusion", "p48/48-1.html", "s9-48-1", "48-1 · Часть 1 (13 слов)",
+     "an optical illusion, a train track, further, seem to be, eventually, appear, touch, play tricks on, complicated…"),
+    ("Стр. 48 · Just an Illusion", "p48/48-2.html", "s9-48-2", "48-2 · Часть 2 (12 слов)",
+     "images, learn, a certain way, for example, this is why, teach, firstly, stare at, opinion…"),
+    ("Стр. 48 · Just an Illusion", "p48/48.html", "s9-48", "48 · Всё вместе (25 слов)",
+     "повторение после двух частей — лучше на следующий день"),
 ]
 
 def back(depth):

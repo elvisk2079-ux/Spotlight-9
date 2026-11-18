@@ -1,0 +1,79 @@
+// TITLE: Just an Illusion · Часть 2
+// EYEBROW: Spotlight 9 · стр. 48 · Just an Illusion · часть 2 из 2
+// SUB: 12 слов из второй половины текста «Just an Illusion». Карточки и семь тренировок — каждая по всем словам.
+// BOARD: Твои слова
+// LEAD: Каждый правильный ответ добавляет точку. Все точки зелёные — слово выучено. Красная рамка — повтори его.
+const META = { ls: "s9-p48-2" };
+const P = [
+  { id: "images", phrase: "images", ru: "изображения", en: "pictures" },
+  { id: "learn", phrase: "learn – learnt", ru: "учиться, узнавать", en: "to get new knowledge or a new skill", say: "learn, learnt" },
+  { id: "certain", phrase: "a certain way", ru: "определённым образом", en: "in one particular way" },
+  { id: "example", phrase: "for example", ru: "например", en: "you say this before you give an example" },
+  { id: "why", phrase: "this is why", ru: "вот почему, поэтому", en: "you say this to give the reason for something" },
+  { id: "teach", phrase: "teach – taught", ru: "учить (кого-то), обучать", en: "to help someone learn something", say: "teach, taught" },
+  { id: "firstly", phrase: "firstly", ru: "во-первых", en: "you say this before your first point" },
+  { id: "else", phrase: "something else", ru: "что-то другое, что-то ещё", en: "a different thing" },
+  { id: "continue", phrase: "continue", ru: "продолжать", en: "to keep doing something" },
+  { id: "stare", phrase: "stare at", ru: "пристально смотреть, уставиться на", en: "to look at something for a long time" },
+  { id: "opinion", phrase: "opinion", ru: "мнение", en: "what you think about something" },
+  { id: "different", phrase: "in a different way", ru: "по-другому, иначе", en: "not in the same way" }
+];
+const DRILLS = [
+  { type: "meaning", title: "Найди слово", short: "RU → EN", instr: "Прочитай по-русски и выбери, как это будет по-английски." },
+  { type: "mcq", title: "Что это значит?", short: "EN → RU", instr: "Прочитай слово по-английски и выбери перевод.", items: AUTO.enru() },
+  { type: "gaps", title: "Choose the word: the text", short: "Text", instr: "Это предложения из текста «Just an Illusion». Выбери слово, которое было в тексте.",
+    items: [
+      { id: "images", t: "Our eyes take in {{*images|opinions|examples}} all day long." },
+      { id: "learn", t: "Our brain then {{*learns|teaches|stares}} how to see things a certain way." },
+      { id: "certain", t: "Our brain learns how to see things {{*a certain way|for example|this is why}}." },
+      { id: "example", t: "When we watch TV, {{*for example|something else|a certain way}}, our brain has learnt to see movement." },
+      { id: "why", t: "{{*This is why|A certain way|Something else}} we can have so much fun with optical illusions!" },
+      { id: "teach", t: "Optical illusions can {{*teach|learn|stare}} us some important lessons about life." },
+      { id: "firstly", t: "{{*Firstly|Something else|A certain way}}, there may be more to a situation than we see at first." },
+      { id: "else", t: "We see one thing at first and {{*something else|for example|a certain way}} when we continue to stare at it." },
+      { id: "continue", t: "…and something else when we {{*continue|teach|opinion}} to stare at it." },
+      { id: "stare", t: "…and something else when we continue to {{*stare at|teach|firstly}} it." },
+      { id: "opinion", t: "It's okay if you and your friend have a different {{*opinion|image|example}} about something." },
+      { id: "different", t: "You are just seeing things {{*in a different way|for example|this is why}}, that's all!" }
+    ] },
+  { type: "mcq", title: "Guess the word", short: "Definitions", instr: "Прочитай объяснение по-английски и выбери слово.", items: AUTO.defn() },
+  { type: "tf", title: "Right or wrong?", short: "Right or wrong", instr: "Предложение верное или с ошибкой? Подумай и про текст, и про слова.",
+    items: [
+      { id: "images", t: "When we watch TV, we see a series of individual images very quickly.", ok: true },
+      { id: "teach", t: "Optical illusions can teach us important lessons about life.", ok: true },
+      { id: "opinion", t: "It's bad if you and your friend have a different opinion.", ok: false, fix: "It's okay if you and your friend have a different opinion." },
+      { id: "learn", t: "My dad learnt me to swim.", ok: false, fix: "My dad taught me to swim." },
+      { id: "stare", t: "She stared at the picture for a long time.", ok: true },
+      { id: "continue", t: "He continued to read after dinner.", ok: true },
+      { id: "else", t: "I don't like fish. Let's eat something other.", ok: false, fix: "I don't like fish. Let's eat something else." },
+      { id: "firstly", t: "Firstly, I want to say thank you.", ok: true },
+      { id: "why", t: "I was ill. This is why I didn't go to school.", ok: true },
+      { id: "different", t: "People sometimes see the same picture in a different ways.", ok: false, fix: "People sometimes see the same picture in different ways." }
+    ] },
+  { type: "gaps", title: "Choose the word: new sentences", short: "Choose", instr: "Теперь те же слова в новых предложениях. Выбери подходящее.",
+    items: [
+      { id: "images", t: "This app can make funny {{*images|opinions|examples}} from your photos." },
+      { id: "learn", t: "Babies {{*learn|teach|stare}} to walk when they are about one year old." },
+      { id: "teach", t: "My mum is going to {{*teach|learn|continue}} me how to drive." },
+      { id: "certain", t: "You have to hold the camera in {{*a certain way|for example|something else}} to take a good photo." },
+      { id: "example", t: "I love fruit, {{*for example|this is why|firstly}} apples and bananas." },
+      { id: "why", t: "I missed the bus. {{*This is why|For example|Something else}} I was late for school." },
+      { id: "firstly", t: "{{*Firstly|Something else|In a different way}}, I want to thank you all for coming. Secondly, I have some news." },
+      { id: "opinion", t: "In my {{*opinion|image|example}}, this is the best film of the year." },
+      { id: "different", t: "The first idea didn't work, so let's do it {{*in a different way|for example|this is why}}." },
+      { id: "else", t: "I don't want pizza. Let's order {{*something else|a certain way|for example}}." },
+      { id: "continue", t: "Please {{*continue|teach|stare at}} reading — you're doing great!" },
+      { id: "stare", t: "It's rude to {{*stare at|teach|continue}} people on the bus." }
+    ] },
+  { type: "order", title: "Собери предложение", short: "Collect", instr: "Нажимай на слова по порядку и собери предложение по-английски. Печатать не нужно.",
+    items: [
+      { id: "why", q: "Вот почему мне нравятся оптические иллюзии.", s: "This is why I like optical illusions." },
+      { id: "opinion", q: "Во-первых, у меня другое мнение.", s: "Firstly, I have a different opinion." },
+      { id: "stare", q: "Не смотри на меня так пристально!", s: "Don't stare at me!" },
+      { id: "different", q: "Попробуй сделать это по-другому.", s: "Try to do it in a different way." },
+      { id: "teach", q: "Учитель научил нас чему-то новому.", s: "The teacher taught us something new." },
+      { id: "example", q: "Например, мы видим движение по телевизору.", s: "For example, we see movement on TV." },
+      { id: "else", q: "Потом мы видим что-то другое.", s: "Then we see something else." },
+      { id: "continue", q: "Продолжай читать!", s: "Continue reading!" }
+    ] }
+];

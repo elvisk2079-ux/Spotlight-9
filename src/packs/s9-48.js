@@ -1,9 +1,9 @@
-// TITLE: Just an Illusion
-// EYEBROW: Spotlight 9 · стр. 48 · Just an Illusion
-// SUB: 25 слов и выражений из текста «Just an Illusion». Карточки и семь тренировок — каждая по всем словам.
+// TITLE: Just an Illusion · Всё вместе
+// EYEBROW: Spotlight 9 · стр. 48 · повторение после двух частей
+// SUB: Все 25 слов вперемешку. Сделай это, когда пройдёшь обе части — лучше на следующий день.
 // BOARD: Твои слова
 // LEAD: Каждый правильный ответ добавляет точку. Все точки зелёные — слово выучено. Красная рамка — повтори его.
-const META = { ls: "s9-p48" };
+const META = { ls: "s9-p48-all", cards: false };
 const P = [
   { id: "illusion", phrase: "an optical illusion", ru: "оптическая иллюзия", en: "a picture that tricks your eyes, so you see something that isn't really there" },
   { id: "track", phrase: "a train track", ru: "железнодорожный путь, рельсы", en: "the metal lines that trains run on" },
@@ -33,7 +33,6 @@ const P = [
 ];
 const DRILLS = [
   { type: "meaning", title: "Найди слово", short: "RU → EN", instr: "Прочитай по-русски и выбери, как это будет по-английски." },
-  { type: "mcq", title: "Что это значит?", short: "EN → RU", instr: "Прочитай слово по-английски и выбери перевод.", items: AUTO.enru() },
   { type: "gaps", title: "Choose the word: the text", short: "Text", instr: "Это предложения из текста «Just an Illusion». Выбери слово, которое было в тексте.",
     items: [
       { id: "track", t: "If you stand at the end of a {{*train track|opinion|image}} and look down it, what do you see?" },
@@ -61,64 +60,5 @@ const DRILLS = [
       { id: "stare", t: "…and something else when we continue to {{*stare at|teach|appear}} it." },
       { id: "opinion", t: "It's okay if you and your friend have a different {{*opinion|image|track}} about something." },
       { id: "different", t: "You are just seeing things {{*in a different way|a train track|for example}}, that's all!" }
-    ] },
-  { type: "mcq", title: "Guess the word", short: "Definitions", instr: "Прочитай объяснение по-английски и выбери слово.", items: AUTO.defn() },
-  { type: "tf", title: "Right or wrong?", short: "Right or wrong", instr: "Предложение верное или с ошибкой? Подумай и про текст, и про слова.",
-    items: [
-      { id: "track", t: "If you look down a train track, the two tracks seem to get closer.", ok: true },
-      { id: "touch", t: "At the end, the two tracks really touch.", ok: false, fix: "The tracks only appear to touch — they don't really touch." },
-      { id: "complicated", t: "Seeing is a simple process.", ok: false, fix: "Seeing is a complicated process." },
-      { id: "images", t: "When we watch TV, we see a series of individual images very quickly.", ok: true },
-      { id: "teach", t: "Optical illusions can teach us important lessons about life.", ok: true },
-      { id: "opinion", t: "It's bad if you and your friend have a different opinion.", ok: false, fix: "It's okay if you and your friend have a different opinion." },
-      { id: "learn", t: "My dad learnt me to swim.", ok: false, fix: "My dad taught me to swim." },
-      { id: "stare", t: "She stared at the picture for a long time.", ok: true },
-      { id: "continue", t: "He continued to read after dinner.", ok: true },
-      { id: "tricks", t: "My eyes play tricks on me when I'm tired.", ok: true },
-      { id: "complicated", t: "This is a very complicate question.", ok: false, fix: "This is a very complicated question." },
-      { id: "else", t: "I don't like fish. Let's eat something other.", ok: false, fix: "I don't like fish. Let's eat something else." },
-      { id: "further", t: "The further you go, the quieter it gets.", ok: true },
-      { id: "seem", t: "He seems be tired today.", ok: false, fix: "He seems to be tired today." }
-    ] },
-  { type: "gaps", title: "Choose the word: new sentences", short: "Choose", instr: "Теперь те же слова в новых предложениях. Выбери подходящее.",
-    items: [
-      { id: "illusion", t: "The lines look curved, but they are straight — it's {{*an optical illusion|a train track|an opinion}}." },
-      { id: "track", t: "We walked along {{*a train track|an opinion|an image}} until we saw the station." },
-      { id: "further", t: "The {{*further|simply|firstly}} you walk from the city, the quieter it gets." },
-      { id: "seem", t: "The two lines {{*seem to be|stare at|teach}} different, but they are the same length." },
-      { id: "eventually", t: "We waited for two hours, and {{*eventually|firstly|simply}} the bus came." },
-      { id: "appear", t: "The trees {{*appear|teach|continue}} smaller when you look at them from far away." },
-      { id: "touch", t: "Don't {{*touch|teach|learn}} the paint — it's still wet!" },
-      { id: "simply", t: "Don't worry — it's {{*simply|eventually|further}} a game." },
-      { id: "tricks", t: "My little brother likes to {{*play tricks on|stare at|teach}} me — yesterday he hid my phone and said it was lost." },
-      { id: "seeing", t: "{{*Seeing|Touching|Continuing}} is believing." },
-      { id: "complicated", t: "This game has very {{*complicated|further|simply}} rules — I don't understand them." },
-      { id: "images", t: "This app can make funny {{*images|opinions|tracks}} from your photos." },
-      { id: "learn", t: "Babies {{*learn|teach|stare}} to walk when they are about one year old." },
-      { id: "teach", t: "My mum is going to {{*teach|learn|touch}} me how to drive." },
-      { id: "certain", t: "You have to hold the camera in {{*a certain way|for example|something else}} to take a good photo." },
-      { id: "example", t: "I love fruit, {{*for example|this is why|eventually}} apples and bananas." },
-      { id: "why", t: "I missed the bus. {{*This is why|For example|Something else}} I was late for school." },
-      { id: "firstly", t: "{{*Firstly|Eventually|Further}}, I want to thank you all for coming. Secondly, I have some news." },
-      { id: "opinion", t: "In my {{*opinion|image|illusion}}, this is the best film of the year." },
-      { id: "different", t: "The first idea didn't work, so let's do it {{*in a different way|a certain image|for example}}." },
-      { id: "know", t: "He says he isn't afraid of spiders, {{*but we all know|this is why|for example}} that he is!" },
-      { id: "really", t: "People say they see ghosts, but ghosts {{*don't really|simply|eventually}} exist." },
-      { id: "else", t: "I don't want pizza. Let's order {{*something else|a certain way|for example}}." },
-      { id: "continue", t: "Please {{*continue|touch|appear}} reading — you're doing great!" },
-      { id: "stare", t: "It's rude to {{*stare at|teach|appear}} people on the bus." }
-    ] },
-  { type: "order", title: "Собери предложение", short: "Collect", instr: "Нажимай на слова по порядку и собери предложение по-английски. Печатать не нужно.",
-    items: [
-      { id: "tricks", q: "Наши глаза нас обманывают.", s: "Our eyes are playing tricks on us." },
-      { id: "seeing", q: "Зрение — сложный процесс.", s: "Seeing is a complicated process." },
-      { id: "eventually", q: "В конце концов рельсы как будто соприкасаются.", s: "Eventually the tracks appear to touch." },
-      { id: "why", q: "Вот почему мне нравятся оптические иллюзии.", s: "This is why I like optical illusions." },
-      { id: "opinion", q: "Во-первых, у меня другое мнение.", s: "Firstly, I have a different opinion." },
-      { id: "stare", q: "Не смотри на меня так пристально!", s: "Don't stare at me!" },
-      { id: "different", q: "Попробуй сделать это по-другому.", s: "Try to do it in a different way." },
-      { id: "seem", q: "Кажется, он устал.", s: "He seems to be tired." },
-      { id: "teach", q: "Учитель научил нас чему-то новому.", s: "The teacher taught us something new." },
-      { id: "example", q: "Например, мы видим движение по телевизору.", s: "For example, we see movement on TV." }
     ] }
 ];
