@@ -1,0 +1,5 @@
+src/out/
+src/node_modules/
+src/package.json
+src/package-lock.json
+__pycache__/
