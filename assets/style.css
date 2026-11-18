@@ -182,3 +182,15 @@ h3 { font-size: 16px; margin: 22px 0 8px; color: var(--muted); }
 .pagehead { margin: 8px 0 14px; }
 
 @media (min-width: 480px) { .mem { height: 100px; font-size: 15px; } }
+
+/* phrase builder */
+.phrase-line { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px 0 18px; min-height: 46px; }
+.pslot { min-width: 54px; height: 42px; border-bottom: 3px solid #b9c6cf; font-size: 20px; font-weight: 800; text-align: center; line-height: 42px; padding: 0 4px; }
+.pslot.on { border-color: var(--teal); color: var(--deep); }
+.phrase-line.win .pslot { border-color: var(--ok); color: var(--ok); }
+.wtile { padding: 0 16px; height: 50px; border-radius: 12px; background: var(--card); font-size: 19px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+.wtile.used { opacity: .2; }
+.wtile.bad { background: var(--badbg); animation: shake .3s; }
+.wtile.hintme { outline: 3px solid var(--sel); }
+.memory.m4 { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.memory.m4 .mem { height: 84px; font-size: 13px; }

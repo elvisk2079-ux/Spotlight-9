@@ -36,6 +36,7 @@
     var seen = {}; seen[w[key]] = 1;
     var out = [];
     shuffle(pool).forEach(function (x) {
+      if (w.g && x.g === w.g) return;
       if (out.length < n && !seen[x[key]]) { seen[x[key]] = 1; out.push(x); }
     });
     return out;
@@ -65,7 +66,12 @@
     return el("button", { class: "speak " + (cls || ""), "aria-label": "Послушать",
       onclick: function (ev) { ev.stopPropagation(); say(text); } }, "🔊");
   }
-  function fill(ex, en) { return ex.replace("___", en); }
+  // Audio only on flashcards (and nowhere else)
+  function sayX(text) { if (cfg && cfg.audio === "all") say(text); }
+  function spk(text, cls) { return cfg && cfg.audio === "all" ? speakerBtn(text, cls) : null; }
+  function N(n) { return cfg && cfg.full ? 999 : n; }
+  function cap(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+  function fill(ex, en) { var r = ex.replace("___", en); return ex.indexOf("___") === 0 ? cap(r) : r; }
 
   // ---------- app shell ----------
   var app, stage, bar, stepLabel, cfg, state;
@@ -161,7 +167,7 @@
             b._w = w; b._side = side;
             b.addEventListener("click", function () {
               if (b.disabled) return;
-              if (side === "en") say(w.en);
+              if (side === "en") sayX(w.en);
               if (!sel || sel._side === side) {
                 if (sel) sel.classList.remove("sel");
                 sel = b; b.classList.add("sel"); return;
@@ -231,10 +237,10 @@
     name: "Перевод EN → RU", icon: "🇬🇧",
     run: function (words, pool) {
       return choiceRound({
-        title: "Выбери перевод", items: sample(words, 10), pool: pool, key: "ru", n: 4,
+        title: "Выбери перевод", items: sample(words, N(10)), pool: pool, key: "ru", n: 4,
         prompt: function (w, box) {
-          add(box, el("div", { class: "prompt" }, el("span", { text: w.en }), speakerBtn(w.en)));
-          say(w.en);
+          add(box, el("div", { class: "prompt" }, el("span", { text: w.en }), spk(w.en)));
+          sayX(w.en);
         }
       });
     }
@@ -244,9 +250,9 @@
     name: "Перевод RU → EN", icon: "🇷🇺",
     run: function (words, pool) {
       return choiceRound({
-        title: "Как это по-английски?", items: sample(words, 10), pool: pool, key: "en", n: 4,
+        title: "Как это по-английски?", items: sample(words, N(10)), pool: pool, key: "en", n: 4,
         prompt: function (w, box) { add(box, el("div", { class: "prompt ru", text: w.ru })); },
-        after: function (w) { say(w.en); }
+        after: function (w) { sayX(w.en); }
       });
     }
   };
@@ -269,7 +275,7 @@
   EX.gap = {
     name: "Вставь слово", icon: "🧩",
     run: function (words, pool) {
-      var items = sample(words.filter(function (w) { return w.ex; }), 8);
+      var items = sample(words.filter(function (w) { return w.ex; }), N(8));
       return choiceRound({
         title: "Вставь слово", hint: "Какое слово пропущено?", items: items,
         pool: pool, key: "en", n: 3,
@@ -279,8 +285,8 @@
           add(box, s);
         },
         after: function (w, box) {
-          var g = box.querySelector(".gapslot"); g.textContent = w.en; g.classList.add("filled");
-          say(fill(w.ex, w.en));
+          var g = box.querySelector(".gapslot"); g.textContent = w.ex.indexOf("___") === 0 ? cap(w.en) : w.en; g.classList.add("filled");
+          sayX(fill(w.ex, w.en));
         }
       });
     }
@@ -290,7 +296,7 @@
     name: "Верно или нет?", icon: "⚡",
     run: function (words, pool) {
       return new Promise(function (done) {
-        var items = sample(words, 10), i = 0;
+        var items = sample(words, N(10)), i = 0;
         function next() {
           if (i >= items.length) return done();
           var w = items[i];
@@ -300,10 +306,10 @@
           var box = screen("Верно или нет?", "Перевод правильный?");
           counter(box, i, items.length);
           add(box, el("div", { class: "pair" },
-            el("div", { class: "pen" }, w.en, speakerBtn(w.en)),
+            el("div", { class: "pen" }, w.en, spk(w.en)),
             el("div", { class: "eq", text: "=" }),
             el("div", { class: "pru", text: shown.ru })));
-          say(w.en);
+          sayX(w.en);
           var answered = false;
           function answer(yes, btn) {
             if (answered) return; answered = true;
@@ -330,20 +336,20 @@
     name: "Мемори", icon: "🧠",
     run: function (words) {
       return new Promise(function (done) {
-        var set = sample(words, 6), tiles = [];
+        var set = sample(words, cfg.full ? 8 : 6), tiles = [];
         set.forEach(function (w) { tiles.push({ w: w, side: "en" }); tiles.push({ w: w, side: "ru" }); });
         tiles = shuffle(tiles);
         var box = screen("Мемори", "Открывай по две карточки и находи пары: слово + перевод.");
         var moves = el("div", { class: "count", text: "Ходы: 0" });
         add(box, moves);
-        var grid = el("div", { class: "memory" }), open = [], found = 0, m = 0, lock = false;
+        var grid = el("div", { class: "memory" + (tiles.length >= 16 ? " m4" : "") }), open = [], found = 0, m = 0, lock = false;
         tiles.forEach(function (t) {
           var b = el("button", { class: "mem" }, el("span", { text: t.side === "en" ? t.w.en : t.w.ru }));
           b._en = t.w.en; if (t.side === "ru") b.classList.add("ruside");
           b.addEventListener("click", function () {
             if (lock || b.classList.contains("open") || b.classList.contains("done")) return;
             b.classList.add("open"); open.push({ b: b, t: t });
-            if (t.side === "en") say(t.w.en);
+            if (t.side === "en") sayX(t.w.en);
             if (open.length === 2) {
               m++; moves.textContent = "Ходы: " + m;
               var a = open[0], c = open[1]; open = [];
@@ -371,7 +377,7 @@
     ok: function (words) { return words.filter(function (w) { return /^[a-z]{4,12}$/i.test(w.en); }).length >= 3; },
     run: function (words) {
       return new Promise(function (done) {
-        var items = sample(words.filter(function (w) { return /^[a-z]{4,12}$/i.test(w.en); }), 5), i = 0;
+        var items = sample(words.filter(function (w) { return /^[a-z]{4,12}$/i.test(w.en); }), cfg.full ? 8 : 5), i = 0;
         function next() {
           if (i >= items.length) return done();
           var w = items[i], word = w.en.toLowerCase(), pos = 0, errs = 0;
@@ -380,7 +386,7 @@
           add(box, el("div", { class: "prompt ru", text: w.ru }));
           var slots = el("div", { class: "slots" });
           word.split("").forEach(function () { slots.appendChild(el("span", { class: "slot" })); });
-          add(box, [el("div", { class: "row center" }, speakerBtn(w.en)), slots]);
+          add(box, [spk(w.en) ? el("div", { class: "row center" }, spk(w.en)) : null, slots]);
           var letters = el("div", { class: "letters" });
           shuffle(word.split("")).forEach(function (ch) {
             var b = el("button", { class: "letter", text: ch });
@@ -390,7 +396,7 @@
                 slots.children[pos].textContent = ch; slots.children[pos].classList.add("on");
                 b.disabled = true; b.classList.add("used"); pos++;
                 if (pos === word.length) {
-                  mark(w, errs === 0); say(w.en); i++;
+                  mark(w, errs === 0); sayX(w.en); i++;
                   slots.classList.add("win");
                   wait(1100).then(next);
                 }
@@ -412,10 +418,66 @@
     }
   };
 
+  function isPhrase(w) { return w.en.trim().split(/\s+/).length >= 2; }
+  EX.phrase = {
+    name: "Собери фразу", icon: "🧱",
+    ok: function (words) { return words.filter(isPhrase).length >= 3; },
+    run: function (words) {
+      return new Promise(function (done) {
+        var phrases = words.filter(isPhrase);
+        var items = sample(phrases, N(6)), i = 0;
+        var allWords = [];
+        words.forEach(function (w) { w.en.split(/\s+/).forEach(function (x) { if (allWords.indexOf(x) < 0) allWords.push(x); }); });
+        function next() {
+          if (i >= items.length) return done();
+          var w = items[i], parts = w.en.split(/\s+/), pos = 0, errs = 0;
+          var box = screen("Собери фразу", "Нажимай на слова по порядку. Есть лишние!");
+          counter(box, i, items.length);
+          add(box, el("div", { class: "prompt ru", text: w.ru }));
+          var line = el("div", { class: "phrase-line" });
+          parts.forEach(function () { line.appendChild(el("span", { class: "pslot" })); });
+          add(box, line);
+          var extra = shuffle(allWords.filter(function (x) { return parts.indexOf(x) < 0; })).slice(0, 2);
+          var tiles = el("div", { class: "letters" });
+          shuffle(parts.concat(extra)).forEach(function (t) {
+            var b = el("button", { class: "wtile", text: t });
+            b.addEventListener("click", function () {
+              if (b.disabled) return;
+              if (t === parts[pos]) {
+                line.children[pos].textContent = t; line.children[pos].classList.add("on");
+                b.disabled = true; b.classList.add("used"); pos++;
+                Array.prototype.forEach.call(tiles.children, function (x) { x.classList.remove("hintme"); });
+                if (pos === parts.length) {
+                  mark(w, errs === 0); i++; line.classList.add("win");
+                  wait(1000).then(next);
+                }
+              } else {
+                errs++; b.classList.add("bad"); vibrate(50);
+                setTimeout(function () { b.classList.remove("bad"); }, 400);
+                if (errs >= 2) {
+                  var h = Array.prototype.filter.call(tiles.children, function (x) { return !x.disabled && x.textContent === parts[pos]; })[0];
+                  if (h) h.classList.add("hintme");
+                }
+              }
+            });
+            tiles.appendChild(b);
+          });
+          add(box, tiles);
+        }
+        next();
+      });
+    }
+  };
+
   // ---------- session plan ----------
   function plan(words) {
+    if (cfg.full) {
+      var rest = ["ruen", "tf", "spell", "phrase", "memory"].filter(function (k) { return !EX[k].ok || EX[k].ok(words); });
+      return ["flash", "match", "enru", "gap"].concat(shuffle(rest));
+    }
     var translation = shuffle(["match", "enru", "ruen"])[0];
-    var extra = ["match", "enru", "ruen", "listen", "tf", "memory", "spell"].filter(function (k) {
+    var extra = ["match", "enru", "ruen", "tf", "memory", "spell", "phrase"].filter(function (k) {
+      if (k === "listen" && cfg.audio !== "all") return false;
       return k !== translation && (!EX[k].ok || EX[k].ok(words));
     });
     var picks = sample(extra, 2);
@@ -439,7 +501,7 @@
       el("details", { class: "wordlist" },
         el("summary", { text: "Список слов" }),
         el("ul", null, state.words.map(function (w) {
-          return el("li", null, el("b", { text: w.en }), " — " + w.ru, speakerBtn(w.en, "small"));
+          return el("li", null, el("b", { text: w.en }), " — " + w.ru, spk(w.en, "small"));
         })))
     ]);
   }
